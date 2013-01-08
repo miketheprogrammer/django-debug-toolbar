@@ -19,12 +19,12 @@ if not settings.configured:
             'django.contrib.sessions',
             'django.contrib.sites',
 
-            'debug_toolbar',
+            'debug_toolbar_ajax',
 
             'tests',
         ],
         MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES + (
-            'debug_toolbar.middleware.DebugToolbarMiddleware',
+            'debug_toolbar_ajax.middleware.DebugToolbarMiddleware',
         ),
         ROOT_URLCONF='',
         DEBUG=False,
