@@ -12,7 +12,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'debug_toolbar_ajax',
+    'debug_toolbar',
 )
 INTERNAL_IPS = ('127.0.0.1',)
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
@@ -23,7 +23,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'debug_toolbar_ajax.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ROOT_URLCONF = 'example.urls'
 SECRET_KEY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcd'
@@ -37,18 +37,18 @@ TEMPLATE_DEBUG = DEBUG
 TEMPLATE_DIRS = (
         os.path.join(PROJECT_PATH, 'templates'),
       )
-debug_toolbar_ajax_PANELS = (
-    'debug_toolbar_ajax.panels.version.VersionDebugPanel',
-    'debug_toolbar_ajax.panels.timer.TimerDebugPanel',
-    'debug_toolbar_ajax.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar_ajax.panels.headers.HeaderDebugPanel',
-    'debug_toolbar_ajax.panels.profiling.ProfilingDebugPanel',
-    'debug_toolbar_ajax.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar_ajax.panels.sql.SQLDebugPanel',
-    'debug_toolbar_ajax.panels.template.TemplateDebugPanel',
-    'debug_toolbar_ajax.panels.cache.CacheDebugPanel',
-    'debug_toolbar_ajax.panels.signals.SignalDebugPanel',
-    'debug_toolbar_ajax.panels.logger.LoggingPanel',
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.cache.CacheDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
 )
 
 CACHE_BACKEND = 'dummy://'
