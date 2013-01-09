@@ -99,6 +99,7 @@ class DebugToolbarMiddleware(object):
             toolbar = DebugToolbar(request)
             for panel in toolbar.panels:
                 panel.process_request(request)
+
             self.__class__.debug_toolbars[thread.get_ident()] = toolbar
 
     def process_view(self, request, view_func, view_args, view_kwargs):
@@ -116,8 +117,22 @@ class DebugToolbarMiddleware(object):
     def process_response(self, request, response):
         __traceback_hide__ = True
         ident = thread.get_ident()
+        
         toolbar = self.__class__.debug_toolbars.get(ident)
+        
         if not toolbar or request.is_ajax():
+            for panel in toolbar.panels:
+                panel.process_response(request, response)
+
+            rendered = toolbar.render_toolbar()
+            from django.utils import simplejson
+            rendered = simplejson.dumps({'rendered':rendered})
+
+            if '{replace}' not in response.content:
+                   if response.content[-1] == '}':
+                        response.content = response.content[:-1] + ', "replace":"{replace}"}'
+
+            response.content = response.content.replace('"{replace}"', rendered)
             return response
         if isinstance(response, HttpResponseRedirect):
             if not toolbar.config['INTERCEPT_REDIRECTS']:
