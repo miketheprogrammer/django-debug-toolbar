@@ -31,8 +31,12 @@ class TimerDebugPanel(DebugPanel):
 
     def process_response(self, request, response):
         stats = {'total_time': (time.time() - self._start_time) * 1000}
+        print 'has resource'
+        print self.has_resource
         if self.has_resource:
             self._end_rusage = resource.getrusage(resource.RUSAGE_SELF)
+            print 'end rusage'
+            print self._end_rusage
             stats['utime'] = 1000 * self._elapsed_ru('ru_utime')
             stats['stime'] = 1000 * self._elapsed_ru('ru_stime')
             stats['total'] = stats['utime'] + stats['stime']

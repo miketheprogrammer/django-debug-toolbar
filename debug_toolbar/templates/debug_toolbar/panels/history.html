@@ -8,13 +8,15 @@
 		<tr>
 			<th>{% trans "Resource" %}</th>
 			<th>{% trans "Value" %}</th>
+			<th>{% trans "Elapsed Time(ms)" %}</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id='history_panel_body'>
 		{% for key, value in rows %}
-			<tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+			<tr class="">
 				<td>{{ key|escape }}</td>
 				<td>{{ value|escape }}</td>
+				<td></td>
 			</tr>
 		{% endfor %}
 	</tbody>

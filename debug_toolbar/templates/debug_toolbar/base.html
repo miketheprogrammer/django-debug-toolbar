@@ -8,20 +8,57 @@
 <script type="text/javascript">
 window.total_time_first_run = true;
 window.total_time = 0.0;
+window.toolbars = [];
+
 window.total_time_accross_requests = function(){
   return 'The total time accross requests is: ' + window.total_time + 'ms';
 }
 
+window.show_toolbar = function(index){
+	$('#djDebug').replaceWith(window.toolbars[index].html);
+	$('#djDebug').show();
+    window.djdt.show_toolbar();
+	for (i in window.toolbars){
+	  window.createHistoryTable(i);
+	}
+	$('.djDebugAjaxHistoryPanel small').html(window.toolbars.length + ' REQUESTS');
+}
+window.createHistoryTable = function(index){
+		var tbody = $('#history_panel_body');
+		var style_type = '';
+		if ( ( index % 2 ) == 0){
+			style_type = 'djDebugEven';
+		} else {
+			style_type = 'djDebugOdd';
+		}
+
+		var html = '';
+
+		toolbar = window.toolbars[index];
+
+		html += '<tr class="' + style_type + '">';
+		html += '<td>' + toolbar.settings.url + '</td>';
+		html += '<td> <a href="#" onclick="window.show_toolbar('+index+')"> click here to show this toolbar </a>';
+		html += '<td>'+toolbar.time + 'ms</td>';
+		html += '</tr>';
+
+		tbody.html(tbody.html() + html);
+}
 
 $(document).ready(function() {
   $(document).ajaxSuccess(function(e, xhr, settings) {
+  	console.log('e');
+  	console.log(e);
+  	console.log('xhr');
+  	console.log(xhr);
   	var data;
   	if (xhr.responseText.length > 5){
   		data = $.parseJSON(xhr.responseText);
   	}
-    window.refreshDjdt(data);
+    window.refreshDjdt(data, e, xhr, settings);
 
     console.log(settings);
+    console.log(settings.url);
   });
 });
 /*!
@@ -98,33 +135,79 @@ $(document).ready(function() {
 	{% endfor %}
 	<div id="djDebugWindow" class="panelContent"></div>
 </div>
-
+            <a rel='facebox' href='#message_popover' id='message_handle'></a>
+            <div id='message_popover' style='display:none;'>
+                <div style='padding:10px;' class='pop_message'></div>
+            </div>
+            <a rel='facebox' href='#address_select_popover' id='address_handle'></a>
+            <div id='address_select_popover' style='display:none;'>
+            <div style='padding:10px;font-size:14px;width:700px;'>
+            <span style='font-weight:bold;'>Please choose which version of the address you want to use:</span><br/><br/>
+            <table>
+            <tr><td>Original address:</td><td><input type='radio' name='selected_address' class='selected_address' value='orig'/></td><td class='old_add'></td></tr>
+            <tr><td>Suggested Address:</td><td><input type='radio' name='selected_address' class='selected_address' value='new'/></td><td class='new_add'></td></tr>
+            </table>
+            <div class='wrap-sbmt clr'>
+              <input id='select_this_address' class='bth arrow select_this_address' type='submit' value='Use this Address' />
+            </div>
+            </div>
+            </div>
+            <style>#facebox .content{padding:0!important;}.select_this_address{cursor:pointer;color:green;}#lat_long{color:#0E6F3A;float:right;font-size:14px;position:relative;top:74px;cursor:pointer;}</style>
+            
 <script type="text/javascript">
 
-window.refreshDjdt = function(ajax_data){
+window.refreshDjdt = function(ajax_data, e, xhr, settings){
     console.log('refreshing');
     console.log(ajax_data);
-    console.log(ajax_data);
+
     if (ajax_data == 'OK'){
     	return false;
     }
     if (ajax_data == undefined){
     	return false;
     }
+    var toolbar = {};
+    var time;
+    toolbar['e'] = e;
+    toolbar['xhr'] = xhr;
+    toolbar['settings'] = settings;
     var v = ajax_data.replace;
     indexOfdjDebug = v.rendered.indexOf('<div id="djDebug"');
     v.rendered = v.rendered.substr(indexOfdjDebug,v.length);
+    
+
     if (window.total_time_first_run){
-      window.total_time += parseFloat($('.djDebugTimerPanel small').html().split('(')[1].split(')')[0].split('ms')[0]);
+
+      
+      toolbar['html'] = $('#djDebug').html();
+      time = parseFloat($('.djDebugTimerPanel small').html().split('(')[1].split(')')[0].split('ms')[0]);
+
+      window.total_time += time;
+	  toolbar['time'] = time;      
+      window.toolbars.push(toolbar);
       window.total_time_first_run = false;
     }
 
     $('#djDebug').replaceWith(v.rendered);
-
-    window.total_time += parseFloat($('.djDebugTimerPanel small').html().split('(')[1].split(')')[0].split('ms')[0]);
-
+    toolbar['html'] = v.rendered;
+    
+    $('.djDebugAjaxHistoryPanel small').html(window.toolbars.length + ' REQUESTS');
+    time = parseFloat($('.djDebugTimerPanel small').html().split('(')[1].split(')')[0].split('ms')[0]);
+    window.total_time += time;
+    toolbar['time'] = time;
+    window.toolbars.push(toolbar);
+    for (i in window.toolbars){
+    	window.createHistoryTable(i);
+    }
     $('#djDebug').show();
     window.djdt.show_toolbar();
-    //window.djdt = window.djdt.init()
+
+    warning_time = 7000.00
+    if (parseFloat(time) > warning_time){
+                    $('#message_handle').facebox().click();
+                    $('.pop_message').html('You have a request that took over '+(warning_time/1000)+' seconds (' + (parseFloat(time)/1000) + ')');
+    }
 }
+
+
 </script>

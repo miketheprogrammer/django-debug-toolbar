@@ -47,6 +47,7 @@ class DebugPanel(object):
     def record_stats(self, stats):
         toolbar = DebugToolbarMiddleware.get_current()
         panel_stats = toolbar.stats.get(self.slug)
+        #print panel_stats
         if panel_stats:
             panel_stats.update(stats)
         else:
