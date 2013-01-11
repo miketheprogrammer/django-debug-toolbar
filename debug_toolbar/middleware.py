@@ -8,11 +8,12 @@ import thread
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.utils import simplejson
 from django.utils.encoding import smart_unicode
 from django.utils.importlib import import_module
-
 import debug_toolbar.urls
 from debug_toolbar.toolbar.loader import DebugToolbar
+
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
@@ -121,18 +122,26 @@ class DebugToolbarMiddleware(object):
         toolbar = self.__class__.debug_toolbars.get(ident)
         
         if not toolbar or request.is_ajax():
-            for panel in toolbar.panels:
-                panel.process_response(request, response)
 
-            rendered = toolbar.render_toolbar()
-            from django.utils import simplejson
-            rendered = simplejson.dumps({'rendered':rendered})
+            if settings.DEBUG_TOOLBAR_CONFIG['ACCEPT_AJAX']:
 
-            if '{replace}' not in response.content:
-                   if response.content[-1] == '}':
-                        response.content = response.content[:-1] + ', "replace":"{replace}"}'
+                try:
+                    simplejson.loads(response.content)
+                except simplejson.JSONDecodeError:
+                    return response
+                for panel in toolbar.panels:
+                    panel.process_response(request, response)
 
-            response.content = response.content.replace('"{replace}"', rendered)
+                rendered = toolbar.render_toolbar()
+                
+                rendered = simplejson.dumps({'rendered':rendered})
+
+                if '{replace}' not in response.content:
+                       if response.content[-1] == '}':
+                            response.content = response.content[:-1] + ', "replace":"{replace}"}'
+
+                response.content = response.content.replace('"{replace}"', rendered)
+
             return response
         if isinstance(response, HttpResponseRedirect):
             if not toolbar.config['INTERCEPT_REDIRECTS']:

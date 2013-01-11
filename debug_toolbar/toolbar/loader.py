@@ -28,6 +28,8 @@ class DebugToolbar(object):
             'DEBUG_TOOLBAR_MEDIA_URL': self.config.get('MEDIA_URL'),
             'STATIC_URL': settings.STATIC_URL,
         }
+        if settings.DEBUG_TOOLBAR_CONFIG['ACCEPT_AJAX']:
+            self.template_context['inject_ajax_processor'] = True
 
         self.load_panels()
         self.stats = {}
@@ -56,11 +58,13 @@ class DebugToolbar(object):
         """
         Renders the overall Toolbar with panels inside.
         """
+
         context = self.template_context.copy()
+        print context
         context.update({
             'panels': self.panels,
         })
-
+        #print render_to_string('debug_toolbar/base.html', context)
         return render_to_string('debug_toolbar/base.html', context)
 
 
@@ -83,6 +87,7 @@ def load_panel_classes():
         'debug_toolbar.panels.cache.CacheDebugPanel',
         'debug_toolbar.panels.signals.SignalDebugPanel',
         'debug_toolbar.panels.logger.LoggingPanel',
+        'debug_toolbar.panels.history.AjaxHistoryPanel',
     ))
     for panel_path in panels:
         try:

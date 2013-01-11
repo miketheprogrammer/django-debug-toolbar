@@ -6,6 +6,7 @@
 
 
 <script type="text/javascript">
+{% if inject_ajax_processor %}
 window.total_time_first_run = true;
 window.total_time = 0.0;
 window.toolbars = [];
@@ -47,20 +48,15 @@ window.createHistoryTable = function(index){
 
 $(document).ready(function() {
   $(document).ajaxSuccess(function(e, xhr, settings) {
-  	console.log('e');
-  	console.log(e);
-  	console.log('xhr');
-  	console.log(xhr);
   	var data;
   	if (xhr.responseText.length > 5){
   		data = $.parseJSON(xhr.responseText);
   	}
     window.refreshDjdt(data, e, xhr, settings);
-
-    console.log(settings);
-    console.log(settings.url);
   });
 });
+
+{% endif %}
 /*!
  * jQuery JavaScript Library v1.7.1
  * http://jquery.com/
@@ -156,13 +152,10 @@ $(document).ready(function() {
             
 <script type="text/javascript">
 
+{% if inject_ajax_processor %}
 window.refreshDjdt = function(ajax_data, e, xhr, settings){
-    console.log('refreshing');
     console.log(ajax_data);
 
-    if (ajax_data == 'OK'){
-    	return false;
-    }
     if (ajax_data == undefined){
     	return false;
     }
@@ -209,5 +202,5 @@ window.refreshDjdt = function(ajax_data, e, xhr, settings){
     }
 }
 
-
+{% endif %}
 </script>
